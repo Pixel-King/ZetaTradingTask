@@ -1,0 +1,38 @@
+.tree-node-node{
+    display: flex;
+    width: 100%;
+}
+.active-node{
+    background-color: rgba(11, 129, 255, 0.2);
+}
+.tree-node-name-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+}
+.tree-node-name-container .tree-node-icon{
+    position: absolute;
+    left: -24px;
+    width: 24px;
+    height: 24px;
+    transition: all 100ms;
+}
+.tree-node-name{
+    font-size: 22px;
+}
+.tree-node-interface{
+    display: flex;
+    align-items: center;
+}
+.tree-node-interface-element{
+    margin-left: 15px;
+    width: 24px;
+    height: 24px;
+}
+.tree-node-interface-element:hover{
+    cursor: pointer;
+}
+.icon-mirror {
+    transform: rotate(180deg);
+}
