@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { setNodeId, setModal, selectSwitch } from "./switchSlice";
 import "./Node.css";
-import AddIconSvg from "./icons/AddIcon";
-import DelIcon from "./icons/DelIcon";
-import EditIcon from "./icons/EditIcon";
-import ArrowIcon from "./icons/ArrowIcon";
+import AddIconSvg from "../../assets/icons/AddIcon";
+import ArrowIcon from "../../assets/icons/ArrowIcon";
+import DelIcon from "../../assets/icons/DelIcon";
+import EditIcon from "../../assets/icons/EditIcon";
 
 function Node({ node, isRoot, childrenPosition, parentNodeId }) {
   const { selectId } = useSelector(selectSwitch);

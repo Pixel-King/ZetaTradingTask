@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   useAddNodeMutation,
@@ -6,7 +6,7 @@ import {
   useRenameNodeMutation,
 } from "../../app/swagger/swagger.api";
 import { selectSwitch, setModal } from "../Node/switchSlice";
-import "./modal.css";
+import style from "./Modal.module.css";
 
 function Modal() {
   const { selectId, nodeName, eventName, showModal } =
@@ -22,26 +22,63 @@ function Modal() {
   const [addNode, addNodeParam] = useAddNodeMutation();
   const [renameNode, editNodeParam] = useRenameNodeMutation();
   const [deleteNode, delNodeParam] = useDeleteNodeMutation();
+  const headerName = useMemo(
+    () =>
+      eventName === "Add"
+        ? "Create"
+        : eventName === "Edit"
+        ? "Rename"
+        : eventName === "Del"
+        ? "Delete"
+        : "",
+    [eventName]
+  );
+  const modalContent = useMemo(() => {
+    if (isLoading) return <div className={style["animate-flicker"]}>Loading...</div>;
+    if (isError)
+      return <div className={style["error-message"]}>{errorMessage}</div>;
+    if (isSuccess)
+      return <div className={style["success-message"]}>{successMessage}</div>;
+    if (!isLoading && !isError && !isSuccess && eventName === "Del")
+      return <div>Are you sure that you want to delete node '{nodeName}'?</div>;
+    if (!isLoading && !isError && !isSuccess && eventName !== "Del")
+      return (
+        <div className={style["form"]}>
+          <label htmlFor="nodeName">Node name:</label>
+          <input
+            name="nodeName"
+            autoComplete="off"
+            onFocus
+            onChange={(e) => setName(e.target.value)}
+            defaultValue={eventName === "Edit" ? nodeName : ""}
+          ></input>
+        </div>
+      );
+  }, [
+    isLoading,
+    isError,
+    isSuccess,
+    eventName,
+    errorMessage,
+    successMessage,
+    nodeName,
+  ]);
 
-  const handelClickAdd = async () => {
-    await addNode({
-      parentNodeId: selectId,
-      nodeName: name,
-    }).unwrap();
+  const handleClick = async () => {
+    if (eventName === "Add")
+      await addNode({
+        parentNodeId: selectId,
+        nodeName: name,
+      }).unwrap();
+    if (eventName === "Edit")
+      await renameNode({
+        nodeId: selectId,
+        newNodeName: name,
+      }).unwrap();
+    if (eventName === "Del") await deleteNode(selectId).unwrap();
   };
 
-  const handelClickEdit = async () => {
-    console.log(name);
-    await renameNode({
-      nodeId: selectId,
-      newNodeName: name,
-    }).unwrap();
-  };
-  const handelClickDel = async () => {
-    await deleteNode(selectId).unwrap();
-  };
-
-  const handelClickCancel = () => {
+  const handleClickCancel = () => {
     dispatch(setModal({ eventName: "", showModal: false }));
   };
 
@@ -60,6 +97,7 @@ function Modal() {
       setErrorMessage(`Error! ${addNodeParam.error?.data?.data?.message}`);
     }
   }, [addNodeParam]);
+
   useEffect(() => {
     if (editNodeParam.isLoading) {
       setLoading(true);
@@ -75,6 +113,7 @@ function Modal() {
       setErrorMessage(`Error! ${editNodeParam.error?.data?.data?.message}`);
     }
   }, [editNodeParam]);
+
   useEffect(() => {
     if (delNodeParam.isLoading) {
       setLoading(true);
@@ -83,7 +122,7 @@ function Modal() {
     }
     if (delNodeParam.isSuccess) {
       setSuccess(true);
-      setSuccessMessage(`Node '${nodeName}'deleted successfully!`);
+      setSuccessMessage(`Node '${nodeName}' deleted successfully!`);
     }
     if (delNodeParam.isError) {
       setError(true);
@@ -101,46 +140,29 @@ function Modal() {
 
   return (
     <div
-      className="modal"
+      className={style.modal}
       style={{ display: `${showModal ? "flex" : "none"}` }}
     >
-      <div className="modal-wrapp">
-        <div className="modal-header">
-          {eventName === "Add"
-            ? "Create"
-            : eventName === "Edit"
-            ? "Rename"
-            : eventName === "Del"
-            ? "Delete"
-            : ""}
-        </div>
-        <div class="line"></div>
-        <div className="modal-content">
-          {isLoading && <div>Loading...</div>}
-          {isError && <div>{errorMessage}</div>}
-          {isSuccess && <div>{successMessage}</div>}
-          {!isLoading && !isError && !isSuccess && eventName === "Del" && (
-            <div>Are you sure that you want to delete node '{nodeName}'?</div>
-          )}
-          {!isLoading && !isError && !isSuccess && eventName !== "Del" && (
-            <div className="form">
-              <label htmlFor="nodeName">Node name:</label>
-              <input
-                name="nodeName"
-                onChange={(e) => setName(e.target.value)}
-                defaultValue={eventName === "Edit" ? nodeName : ""}
-              ></input>
-            </div>
-          )}
-        </div>
-        <div class="line"></div>
-        <div className="modal-footer">
-          <button onClick={handelClickCancel}>Cancel</button>
-          {eventName === "Add" && <button onClick={handelClickAdd}>Create</button>}
-          {eventName === "Edit" && (
-            <button onClick={handelClickEdit}>Rename</button>
-          )}
-          {eventName === "Del" && <button onClick={handelClickDel}>Del</button>}
+      <div className={style["modal-wrapp"]}>
+        <div className={style["modal-header"]}>{headerName}</div>
+        <div class={style["line"]}></div>
+        <div className={style["modal-content"]}>{modalContent}</div>
+        <div className={style["modal-footer"]}>
+          <div class={style["line"]}></div>
+          <button
+            className={style["modal-footer-button"]}
+            onClick={handleClickCancel}
+          >
+            Cancel
+          </button>
+          <button
+            className={`${style["modal-footer-button"]} ${
+              style[headerName.toLocaleLowerCase()]
+            }`}
+            onClick={handleClick}
+          >
+            {headerName}
+          </button>
         </div>
       </div>
     </div>
