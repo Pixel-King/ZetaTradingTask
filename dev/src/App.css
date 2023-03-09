@@ -1,3 +1,5 @@
 .tree-wrap{
-    margin: 0 24px;
+    margin-left: 24px;
+    width: max-content;
+    min-width: 100%;
 }
