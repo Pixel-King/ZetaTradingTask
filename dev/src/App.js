@@ -52,17 +52,18 @@ import Node from "./components/Node/Node";
 
 function App() {
   const { data } = useGetTreeQuery();
-  const deepCoef = 0;
   return (
-    <div className="tree-wrap">
-      <Node
-        node={data}
-        isRoot={true}
-        childrenPosition={deepCoef}
-        parentNodeId={data?.id}
-      />
+    <>
+      <div className="tree-wrap">
+        <Node
+          node={data}
+          isRoot={true}
+          childrenPosition={0}
+          parentNodeId={data?.id}
+        />
+      </div>
       <Modal />
-    </div>
+    </>
   );
 }
 
